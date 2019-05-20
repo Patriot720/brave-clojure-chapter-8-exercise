@@ -29,9 +29,23 @@
     (testing "Test getting html from google"
       (let [result (web/find "keepo")]
         (is (seq result))
-        (is (clojure.string/includes? result "Winnie")))))
+        (is (clojure.string/includes? result "Winnie")))
+      (let [result (web/find "wtf" :yahoo)]
+        (is (seq result))
+        (is (clojure.string/includes? result "http://www.wtfpod.com/")))))
 
 (def example-search-bing "example-search-bing.html")
+(def example-search-yahoo "example-search-yahoo.html")
+(def bing-expected-url "https://keep.google.com/")
+(def yahoo-expected-url "http://www.wtfpod.com/")
 (deftest get-first-search-result-url-test
   (is (= (web/get-first-search-result-url (slurp example-search-bing))
-         "https://keep.google.com/")))
+         bing-expected-url))
+  (is (= (web/get-first-search-result-url (slurp example-search-yahoo) :yahoo)
+         yahoo-expected-url)))
+
+(deftest multiple-search-engines-test
+  (let [result (web/get-first "keepo" [:yahoo])]
+    (println result)
+    ; (is (= (count result) 2))
+))

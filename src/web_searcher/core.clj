@@ -6,13 +6,31 @@
   [& args]
   (println "Hello, World!"))
 
-(defn find [query]
-  (slurp (str "https://www.bing.com/search?q=" query)))
+(def engine-data
+  {:bing {:url "https://www.bing.com/search?q="
+          :regex #"b_title.+?<a href=\"(.+?)\""}
+   :yahoo {:url "https://search.yahoo.com/search?p="
+           :regex #"compTitle options-toggle.+?href=\"(.+?)\""}})
 
-(defn get-first-search-result-url [html]
-  (last (re-find #"b_title.+?<a href=\"(.+?)\"" html)))
+(defn find
+  ([query engine]
+   (slurp (str (:url (engine engine-data)) query)))
+  ([query]
+   (find query :bing)))
 
-(defn get-first [query]
-  (-> (find query)
-      get-first-search-result-url
-      slurp))
+(defn get-first-search-result-url
+  ([html engine]
+   (println engine)
+   (last (re-find (:regex (engine engine-data)) html)))
+  ([html]
+   (get-first-search-result-url html :bing)))
+
+(defn get-first
+  ([query engines]
+   (map (fn [engine]
+          (-> (find query engine)
+              (get-first-search-result-url engine)
+              slurp))
+        engines))
+  ([query]
+   (get-first query :bing)))
