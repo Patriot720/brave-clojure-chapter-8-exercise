@@ -25,14 +25,14 @@
     (testing "Future testing"
       (is (= @(future-variable-1) 1))))
 
-#_(deftest search-testing
-    (testing "Test getting html from google"
-      (let [result (web/find "keepo")]
-        (is (seq result))
-        (is (clojure.string/includes? result "Winnie")))
-      (let [result (web/find "wtf" :yahoo)]
-        (is (seq result))
-        (is (clojure.string/includes? result "http://www.wtfpod.com/")))))
+(deftest search-testing
+  (testing "Test getting html from google"
+    (let [result (web/find "keepo")]
+      (is (seq result))
+      (is (clojure.string/includes? result "Winnie")))
+    (let [result (web/find "wtf" :yahoo)]
+      (is (seq result))
+      (is (clojure.string/includes? result "http://www.wtfpod.com/")))))
 
 (def example-search-bing "example-search-bing.html")
 (def example-search-yahoo "example-search-yahoo.html")
@@ -45,7 +45,5 @@
          yahoo-expected-url)))
 
 (deftest multiple-search-engines-test
-  (let [result (web/get-first "keepo" [:yahoo])]
-    (println result)
-    ; (is (= (count result) 2))
-))
+  (let [result (web/get-first "keepo" [:bing :yahoo])]
+    (is (= (count result) 2))))

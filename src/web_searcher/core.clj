@@ -10,7 +10,7 @@
   {:bing {:url "https://www.bing.com/search?q="
           :regex #"b_title.+?<a href=\"(.+?)\""}
    :yahoo {:url "https://search.yahoo.com/search?p="
-           :regex #"compTitle options-toggle.+?href=\"(.+?)\""}})
+           :regex #"yst result.+?href=\"(.+?)\""}})
 
 (defn find
   ([query engine]
@@ -20,7 +20,6 @@
 
 (defn get-first-search-result-url
   ([html engine]
-   (println engine)
    (last (re-find (:regex (engine engine-data)) html)))
   ([html]
    (get-first-search-result-url html :bing)))
@@ -29,8 +28,7 @@
   ([query engines]
    (map (fn [engine]
           (-> (find query engine)
-              (get-first-search-result-url engine)
-              slurp))
+              (get-first-search-result-url engine)))
         engines))
   ([query]
    (get-first query :bing)))
