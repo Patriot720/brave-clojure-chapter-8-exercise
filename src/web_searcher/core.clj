@@ -26,9 +26,9 @@
 
 (defn get-first
   ([query engines]
-   (map (fn [engine]
-          (-> (find query engine)
-              (get-first-search-result-url engine)))
-        engines))
+   (pmap (fn [engine]
+           (-> (find query engine)
+               (get-first-search-result-url engine)))
+         engines))
   ([query]
    (get-first query :bing)))

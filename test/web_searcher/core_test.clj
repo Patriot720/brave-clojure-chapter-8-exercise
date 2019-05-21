@@ -25,25 +25,23 @@
     (testing "Future testing"
       (is (= @(future-variable-1) 1))))
 
+(declare test-query-response test-regex-matching)
 (deftest search-testing
-  (testing "Test getting html from google"
-    (let [result (web/find "keepo")]
-      (is (seq result))
-      (is (clojure.string/includes? result "Winnie")))
-    (let [result (web/find "wtf" :yahoo)]
-      (is (seq result))
-      (is (clojure.string/includes? result "http://www.wtfpod.com/")))))
-
-(def example-search-bing "example-search-bing.html")
-(def example-search-yahoo "example-search-yahoo.html")
-(def bing-expected-url "https://keep.google.com/")
-(def yahoo-expected-url "http://www.wtfpod.com/")
-(deftest get-first-search-result-url-test
-  (is (= (web/get-first-search-result-url (slurp example-search-bing))
-         bing-expected-url))
-  (is (= (web/get-first-search-result-url (slurp example-search-yahoo) :yahoo)
-         yahoo-expected-url)))
+  (doseq [[engine _] web/engine-data]
+    ((juxt test-query-response
+           test-regex-matching) engine)))
 
 (deftest multiple-search-engines-test
   (let [result (web/get-first "keepo" [:bing :yahoo])]
     (is (= (count result) 2))))
+
+(defn- test-regex-matching [engine]
+  (let [file (str "example-search-" (name engine) ".html")]
+    (is (clojure.string/includes?
+         (web/get-first-search-result-url (slurp file) engine)
+         "http"))))
+
+(defn- test-query-response [engine]
+  (let [result (web/find "keepo" engine)]
+    (is (seq result))
+    (is (clojure.string/includes? result "<body"))))
